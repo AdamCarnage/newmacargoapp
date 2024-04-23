@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "619943559803",
+    "project_id": "abood-erp-c5ee0",
+    "storage_bucket": "abood-erp-c5ee0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619943559803:android:4f6f0e63c06ae875e1d8de",
+        "android_client_info": {
+          "package_name": "com.example.enquiry"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtmgqD_SjpQhkDqH8e7FlGm8PYuYlIp1A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
