@@ -78,6 +78,7 @@ flutter:
     - assets/images/no_notification.png
     - assets/images/404.png
     - assets/images/setting.png
+    - assets/images/brand.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

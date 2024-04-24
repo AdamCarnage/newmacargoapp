@@ -8,7 +8,8 @@ class ViewEnquiryPage1 extends StatefulWidget {
   final Map<String, dynamic> enquiry;
   final String userId;
 
-  const ViewEnquiryPage1({super.key, required this.enquiry, required this.userId});
+  const ViewEnquiryPage1(
+      {super.key, required this.enquiry, required this.userId});
 
   @override
   _ViewEnquiryPage1State createState() => _ViewEnquiryPage1State();
@@ -57,8 +58,8 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
                 child: Container(
                   color: Colors.grey[300],
                   width: MediaQuery.of(context).size.width,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -231,8 +232,7 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
-                                      color:
-                                          Color.fromARGB(255, 69, 69, 69),
+                                      color: Color.fromARGB(255, 69, 69, 69),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
@@ -250,8 +250,7 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
-                                      color:
-                                          Color.fromARGB(255, 69, 69, 69),
+                                      color: Color.fromARGB(255, 69, 69, 69),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
@@ -470,7 +469,6 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
           const SnackBar(content: Text('Enquiry approved successfully')),
         );
 
-        // Navigate back to the previous screen and pass the result
         Navigator.pop(context, true);
       } else {
         print('Failed to approve enquiry: ${response.body}');
@@ -481,7 +479,8 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
     } catch (e) {
       print('Error sending request: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred while sending the request')),
+        const SnackBar(
+            content: Text('An error occurred while sending the request')),
       );
     }
   }
@@ -542,7 +541,8 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
     } catch (e) {
       print('Error sending request: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred while sending the request')),
+        const SnackBar(
+            content: Text('An error occurred while sending the request')),
       );
     }
   }

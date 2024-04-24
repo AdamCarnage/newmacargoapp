@@ -1,22 +1,40 @@
 import 'package:enquiry/pages/dashboard.dart';
+import 'package:enquiry/pages/loadin_screen.dart';
+import 'package:enquiry/pages/login.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      home: SplashScreen(),
       routes: {
-        '/': (context) => const MyDashboard(),
-        '/dashboard': (context) => const MyDashboard(),
+        '/login': (context) => LogInScreen(),
+        '/dashboard': (context) => MyDashboard(),
       },
+      initialRoute: '/', // Set initial route to splash screen
     );
   }
 }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: SplashScreen(),
+//       initialRoute: '/',
+//       routes: {
+//         '/': (context) => LogInScreen(),
+//         '/dashboard': (context) => const MyDashboard(),
+//       },
+//     );
+//   }
+// }

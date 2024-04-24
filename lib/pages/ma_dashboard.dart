@@ -6,7 +6,7 @@ import 'package:enquiry/utils/user_account_management.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:enquiry/pages/enquiry.dart';
-// import 'package:enquiry/pages/nomination.dart'; // Commented out nomination import
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ma_dashboard extends StatefulWidget {
   const ma_dashboard({super.key});
@@ -17,8 +17,8 @@ class ma_dashboard extends StatefulWidget {
 
 class _ma_dashboardState extends State<ma_dashboard> {
   late Future<int> _enquiryCount;
-  // late Future<int> _nominationCount; // Commented out nomination count
   late UserDetail userDetail;
+  // late Future<int> _nominationCount; // Commented out nomination count
 
   @override
   void initState() {
@@ -33,7 +33,6 @@ class _ma_dashboardState extends State<ma_dashboard> {
       userDetail = (await UserAccountManagement().getUserDetail())!;
       print(userDetail.user.apiToken);
     } catch (e) {
-      // Navigator.pushReplacementNamed(context, '/login');
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const LogInScreen()));
     }
@@ -68,33 +67,43 @@ class _ma_dashboardState extends State<ma_dashboard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Image.asset(
-                  'assets/images/abood.png', // Replace with your logo path
-                  height: 30, // Adjust height as needed
-                  width: 30, // Adjust width as needed
+                  'assets/images/abood.png',
+                  height: 30,
+                  width: 30,
                 ),
-                // PopupMenuButton<String>(
-                //   offset: Offset(0, 50), // Position the popup below the dots
-                //   icon: Icon(Icons.more_vert, color: Colors.white),
-                //   onSelected: (value) {
-                //     if (value == 'logout') {
-                //       Navigator.push(
-                //         context,
-                //         MaterialPageRoute(builder: (context) => LogInScreen()),
-                //       );
-                //     }
-                //   },
-                //   itemBuilder: (BuildContext context) =>
-                //       <PopupMenuEntry<String>>[
-                //     const PopupMenuItem<String>(
-                //       value: 'logout',
-                //       child: ListTile(
-                //         leading: Icon(Icons.logout,
-                //             color: Color.fromARGB(255, 0, 0, 0)),
-                //         title: Text('Logout'),
-                //       ),
-                //     ),
-                //   ],
-                // ),
+                PopupMenuButton<String>(
+                  offset: Offset(0, 50), // Position the popup below the dots
+                  icon: Icon(Icons.more_vert, color: Colors.white),
+                  onSelected: (value) async {
+                    if (value == 'logout') {
+                      // Remove user data from SharedPreferences
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.remove('api_token');
+                      await prefs.remove('id');
+                      await prefs.remove('username');
+                      await prefs.remove('email');
+
+                      // Navigate to login screen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LogInScreen()),
+                      );
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'logout',
+                      child: ListTile(
+                        leading: Icon(Icons.logout,
+                            color: Color.fromARGB(255, 0, 0, 0)),
+                        title: Text('Logout'),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
             const SizedBox(
@@ -144,7 +153,7 @@ class _ma_dashboardState extends State<ma_dashboard> {
                       'Check Your Internet Connection!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 16,
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
                       ),
@@ -257,7 +266,7 @@ class DashboardContent extends StatelessWidget {
                             width: size.width * 0.07,
                             child: Center(
                               child: Text(
-                                enquiryCount.toString(),
+                                '${enquiryCount ?? 0}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
