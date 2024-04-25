@@ -79,7 +79,7 @@ flutter:
     - assets/images/404.png
     - assets/images/setting.png
     - assets/images/brand.png
-
+    - assets/images/pipeline.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

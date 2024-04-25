@@ -1,8 +1,11 @@
+import 'package:enquiry/models/user_detail_model.dart';
+import 'package:enquiry/utils/user_account_management.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ViewNominationPage extends StatefulWidget {
   final Map<String, dynamic> nominationData;
-  final int userId;
+  final String userId;
 
   const ViewNominationPage({
     super.key,
@@ -16,11 +19,19 @@ class ViewNominationPage extends StatefulWidget {
 
 class _ViewNominationPageState extends State<ViewNominationPage> {
   late TextEditingController _remarksController;
+  bool canApprove = false;
+  late UserDetail userDetail;
 
   @override
   void initState() {
     super.initState();
+    _loadUserDetail();
+    canApprove = widget.nominationData['is_approve'] == 1;
     _remarksController = TextEditingController();
+  }
+
+  _loadUserDetail() async {
+    userDetail = (await UserAccountManagement().getUserDetail())!;
   }
 
   @override
@@ -31,79 +42,365 @@ class _ViewNominationPageState extends State<ViewNominationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final vehicleData = widget.nominationData['vehicle'][0];
+    final vehicleRegistrationNumber =
+        vehicleData['vehicle_registration_number'];
+    final trailerChassisNumber = vehicleData['trailer_chassis_number'];
+    final driverName = vehicleData['driver_name'];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Truck Nomination ID - ${widget.nominationData['client_inquiry_id']}',
+          'Nomination - ${widget.nominationData['id']}',
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 245, 33, 18),
+        backgroundColor: Color(0xFF00072D),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Table for nomination details
-              DataTable(
-                columns: const <DataColumn>[
-                  DataColumn(
-                    label: Text('Field'),
-                    // width: 100,
+              Center(
+                child: Container(
+                  color: Colors.grey[300],
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'REF -${widget.nominationData['id']}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 0, 0, 0),
+                        ),
+                      ),
+                      const SizedBox(height: 8), // Spacer
+                    ],
                   ),
-                  DataColumn(
-                    label: Text('Value'),
-                    // width: 200,
-                  ),
-                ],
-                rows: const <DataRow>[
-                  // ... your DataRow widgets
-                ],
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _remarksController,
-                decoration: const InputDecoration(
-                  labelText: 'Remarks',
-                  border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 12.0),
+
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Action when the approve button is pressed
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      minimumSize: const Size(160, 40),
-                    ),
-                    child: const Text(
-                      'Approve',
-                      style: TextStyle(color: Colors.white),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Received On',
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        '${widget.nominationData['created_date']}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text(
+                        'Received By',
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      Container(
+                        child: Text(
+                          '${widget.nominationData['created_by']}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12.0),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Client',
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          '${widget.nominationData['client']}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Action when the reject button is pressed
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      minimumSize: const Size(160, 40),
-                    ),
-                    child: const Text(
-                      'Reject',
-                      style: TextStyle(color: Colors.white),
+                  const SizedBox(width: 10), // Add some space between columns
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          'Type',
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          '${widget.nominationData['type']}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: Color.fromARGB(255, 182, 6, 6),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
+              ),
+
+              const SizedBox(height: 12.0),
+
+              Center(
+                child: Container(
+                  color: Colors.grey[300],
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    'Waiting to be Approved by ${widget.nominationData['position']}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Color.fromARGB(255, 141, 141, 141),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12.0),
+
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  'Nomination Information',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+
+              Container(
+                margin: EdgeInsets.zero,
+                child: const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey,
+                ),
+              ),
+
+              Container(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Reg_no:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Color.fromARGB(255, 69, 69, 69),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$vehicleRegistrationNumber',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 152, 152, 152),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 28),
+                                  const Text(
+                                    'Chassis_no:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Color.fromARGB(255, 69, 69, 69),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '$trailerChassisNumber',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 152, 152, 152),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '$driverName',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 0),
+                      child: Divider(
+                        height: 4,
+                        thickness: 4,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 18.0),
+
+              SizedBox(
+                height: 50.0, // Adjust height as needed
+                width: 500.0, // Adjust width as needed
+                child: TextField(
+                  controller: _remarksController,
+                  decoration: InputDecoration(
+                    hintText: 'Remarks',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                      borderSide: const BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                      borderSide: const BorderSide(color: Colors.black),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18.0),
+
+              // Action Button
+              SizedBox(
+                height: 60.0, // Fixed height for the button
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        showCupertinoModalPopup(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              CupertinoActionSheet(
+                            actions: <CupertinoActionSheetAction>[
+                              CupertinoActionSheetAction(
+                                child: const Text(
+                                  'Approve Enquiry',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Colors.green, // Green color for approve
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  // approveNomination(); // Call the new function here
+                                },
+                              ),
+                              CupertinoActionSheetAction(
+                                child: const Text(
+                                  'Reject Enquiry',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 182, 6,
+                                        6), // Black color for reject
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  // rejectNomination(); // Keep the rejectEnquiry function as it is
+                                },
+                              ),
+                            ],
+                            cancelButton: CupertinoActionSheetAction(
+                              child: const Text('Cancel',
+                                  style: TextStyle(
+                                    // fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 0, 0, 0),
+                                  )),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Color(0xFF00072D),
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                      ),
+                      child: const Text(
+                        'ACTION',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

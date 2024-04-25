@@ -29,6 +29,7 @@ class _EnquiryApprovalState extends State<EnquiryApproval>
 
   Future<List<dynamic>> fetchEnquiries(String status) async {
     final completer = Completer<List<dynamic>>();
+
     Timer(const Duration(seconds: 10), () {
       if (!completer.isCompleted) {
         completer.completeError('Timeout');
@@ -48,13 +49,6 @@ class _EnquiryApprovalState extends State<EnquiryApproval>
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body)['data'];
-      if (status == 'pending') {
-        data =
-            data.where((enquiry) => int.parse(enquiry['level']) == 1).toList();
-      } else if (status == 'approved') {
-        data =
-            data.where((enquiry) => int.parse(enquiry['level']) >= 2).toList();
-      }
       completer.complete(data);
     } else {
       completer.completeError('Error: ${response.body}');

@@ -1,4 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:enquiry/models/user_detail_model.dart';
+import 'package:enquiry/utils/user_account_management.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
@@ -17,6 +19,7 @@ class ViewEnquiryPage1 extends StatefulWidget {
 
 class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
   bool canApprove = false;
+  late UserDetail userDetail;
   TextEditingController remarksController = TextEditingController();
 
   @override
@@ -27,7 +30,12 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
       }
     });
     super.initState();
+    _loadUserDetail();
     canApprove = widget.enquiry['is_approve'] == 1;
+  }
+
+  _loadUserDetail() async {
+    userDetail = (await UserAccountManagement().getUserDetail())!;
   }
 
   @override
@@ -295,16 +303,6 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
                             ],
                           ),
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.all(16.0),
-                        //   child: Text(
-                        //     '19200 USD',
-                        //     style: TextStyle(
-                        //       fontWeight: FontWeight.bold,
-                        //       fontSize: 16,
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                     Container(
@@ -433,8 +431,11 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
     final String apiUrl =
         'http://www.macargotest.iosuite.org/api/v1/enquiry/approve/${widget.enquiry['client_inquiry_id']}';
 
+    final userDetail = await UserAccountManagement().getUserDetail();
+    final userId = userDetail?.user.id.toString();
+
     final Map<String, String> headers = {
-      'user-id': '40',
+      'user-id': userId!,
       'department-Id': '3',
       'Content-Type': 'application/json',
     };

@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:enquiry/models/user_detail_model.dart';
+import 'package:enquiry/pages/enquiry.dart';
 import 'package:enquiry/pages/login.dart';
+import 'package:enquiry/pages/nomination.dart';
 import 'package:enquiry/utils/user_account_management.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:enquiry/pages/enquiry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/user_detail_model.dart';
 
 class ma_dashboard extends StatefulWidget {
   const ma_dashboard({super.key});
@@ -18,14 +20,28 @@ class ma_dashboard extends StatefulWidget {
 class _ma_dashboardState extends State<ma_dashboard> {
   late Future<int> _enquiryCount;
   late UserDetail userDetail;
-  // late Future<int> _nominationCount; // Commented out nomination count
+  late Future<int> _nominationCount;
 
   @override
   void initState() {
     super.initState();
     _loadUserDetail();
     _enquiryCount = fetchEnquiryCount();
-    // _nominationCount = fetchNominationCount(); // Commented out nomination count
+    _refreshEnquiryCount();
+    _nominationCount = fetchNominationCount();
+    _refreshNominationCount();
+  }
+
+  _refreshEnquiryCount() async {
+    setState(() {
+      _enquiryCount = fetchEnquiryCount();
+    });
+  }
+
+  _refreshNominationCount() async {
+    setState(() {
+      _nominationCount = fetchNominationCount();
+    });
   }
 
   _loadUserDetail() async {
@@ -38,14 +54,45 @@ class _ma_dashboardState extends State<ma_dashboard> {
     }
   }
 
-  Future<int> fetchEnquiryCount() async {
+  Future<int> fetchNominationCount() async {
+    final userDetail = await UserAccountManagement().getUserDetail();
+    final userId = userDetail?.user.id.toString();
+
     final response = await http.get(
-      Uri.parse('https://macargotest.iosuite.org/api/v1/enquiry'),
+      Uri.parse('https://macargotest.iosuite.org/api/v1/loading-nomination'),
+      headers: <String, String>{
+        'user-id': userId!,
+      },
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body)['data'];
-      return data.length; // Returns the length of the data array
+      List<dynamic> data = json.decode(response.body)['data'];
+
+      int count = data.length;
+
+      return count;
+    } else {
+      return 0;
+    }
+  }
+
+  Future<int> fetchEnquiryCount() async {
+    final userDetail = await UserAccountManagement().getUserDetail();
+    final userId = userDetail?.user.id.toString();
+
+    final response = await http.get(
+      Uri.parse('https://macargotest.iosuite.org/api/v1/enquiry'),
+      headers: <String, String>{
+        'user-id': userId!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)['data'];
+
+      int count = data.length;
+
+      return count;
     } else {
       return 0;
     }
@@ -125,20 +172,10 @@ class _ma_dashboardState extends State<ma_dashboard> {
         builder: (context, enquirySnapshot) {
           if (enquirySnapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 40,
-                    width: 40,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 1,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color.fromARGB(255, 182, 6, 6),
-                      ),
-                    ),
-                  ),
-                ],
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 182, 6, 6),
+                ),
               ),
             );
           } else if (enquirySnapshot.hasError) {
@@ -164,14 +201,87 @@ class _ma_dashboardState extends State<ma_dashboard> {
             }
             return Center(child: Text('Error: ${enquirySnapshot.error}'));
           } else {
-            return DashboardContent(
-              size: size,
-              enquiryCount: enquirySnapshot.data ?? 0,
-              // nominationCount: nominationSnapshot.data ?? 0, // Commented out nomination count
+            return FutureBuilder<int>(
+              future: _nominationCount,
+              builder: (context, nominationSnapshot) {
+                if (nominationSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color.fromARGB(255, 182, 6, 6),
+                      ),
+                    ),
+                  );
+                } else if (nominationSnapshot.hasError) {
+                  return Center(
+                      child: Text('Error: ${nominationSnapshot.error}'));
+                } else {
+                  return DashboardContent(
+                    size: size,
+                    enquiryCount: enquirySnapshot.data ?? 0,
+                    nominationCount: nominationSnapshot.data ?? 0,
+                  );
+                }
+              },
             );
           }
         },
       ),
+
+      // body: FutureBuilder<int>(
+      //   future: _enquiryCount,
+      //   builder: (context, enquirySnapshot) {
+      //     if (enquirySnapshot.connectionState == ConnectionState.waiting) {
+      //       return const Center(
+      //         child: Column(
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           children: [
+      //             SizedBox(
+      //               height: 40,
+      //               width: 40,
+      //               child: CircularProgressIndicator(
+      //                 strokeWidth: 1,
+      //                 valueColor: AlwaysStoppedAnimation<Color>(
+      //                   Color.fromARGB(255, 182, 6, 6),
+      //                 ),
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       );
+      //     } else if (enquirySnapshot.hasError) {
+      //       if (enquirySnapshot.error is SocketException) {
+      //         return const Center(
+      //           child: Column(
+      //             mainAxisAlignment: MainAxisAlignment.center,
+      //             children: [
+      //               Icon(Icons.wifi_off,
+      //                   size: 60, color: Color.fromARGB(255, 182, 6, 6)),
+      //               Text(
+      //                 'Check Your Internet Connection!',
+      //                 textAlign: TextAlign.center,
+      //                 style: TextStyle(
+      //                   fontSize: 16,
+      //                   color: Colors.grey,
+      //                   fontWeight: FontWeight.bold,
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         );
+      //       }
+      //       return Center(child: Text('Error: ${enquirySnapshot.error}'));
+      //     } else {
+      //       return DashboardContent(
+      //         size: size,
+      //         enquiryCount: enquirySnapshot.data ?? 0,
+      //         nominationCount: nominationSnapshot.data ??
+      //             0, // Commented out nomination count
+      //       );
+      //     }
+      //   },
+      // ),
     );
   }
 }
@@ -181,179 +291,64 @@ class DashboardContent extends StatelessWidget {
     super.key,
     required this.size,
     this.enquiryCount,
-    // this.nominationCount, // Commented out nomination count
+    this.nominationCount,
   });
 
   final Size size;
   final int? enquiryCount;
-  // final int? nominationCount; // Commented out nomination count
+  final int? nominationCount;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Column(
       children: [
-        // Enquiry Container
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const EnquiryApproval()),
-            );
-          },
-          child: Container(
-            width: size.width * 0.47,
-            margin: EdgeInsets.all(size.width * 0.01),
-            constraints: const BoxConstraints(minHeight: 100),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 182, 6, 6),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Enquiry Container
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const EnquiryApproval()),
+                );
+              },
+              child: Container(
+                width: size.width * 0.47,
+                margin: EdgeInsets.all(size.width * 0.01),
+                constraints: const BoxConstraints(minHeight: 100),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 182, 6, 6),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Column(
+                    Row(
                       children: [
-                        Container(
-                          width: size.width * 0.27,
-                          height: size.height * 0.12,
-                          decoration: const BoxDecoration(),
-                          padding: const EdgeInsets.all(5),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                width: size.width * 0.47,
-                                height: size.height * 0.06,
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Image.asset(
-                                        'assets/images/enquiry.png',
-                                        height: size.height * 0.04,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      width: size.width * 0.2,
-                      height: size.height * 0.07,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                color: const Color(0xffC8EA00),
-                                width: 4,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: size.height * 0.03,
-                            width: size.width * 0.07,
-                            child: Center(
-                              child: Text(
-                                '${enquiryCount ?? 0}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 19,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const Positioned(
-                            top: 0,
-                            right: 6,
-                            child: CircleAvatar(
-                              backgroundColor: Color.fromARGB(255, 0, 0, 0),
-                              radius: 11,
-                              child: Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(5),
-                                  child: CircleAvatar(
-                                    backgroundColor: Color(0xffC8EA00),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  width: size.width * 0.46,
-                  padding: const EdgeInsets.only(left: 15, bottom: 10),
-                  child: const Text(
-                    'Enquiry',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // Truck Nomination Container
-/* GestureDetector(
-  onTap: () {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => truck_nomination()),
-    // );
-  },
-  child: */
-        Container(
-          width: size.width * 0.47,
-          margin: EdgeInsets.all(size.width * 0.01),
-          constraints: const BoxConstraints(minHeight: 100),
-          decoration: BoxDecoration(
-            color: const Color(0xFF00072D),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        width: size.width * 0.27,
-                        height: size.height * 0.12,
-                        decoration: const BoxDecoration(),
-                        padding: const EdgeInsets.all(5),
-                        child: Column(
+                        Column(
                           children: [
-                            SizedBox(
-                              width: size.width * 0.47,
-                              height: size.height * 0.07,
-                              child: Row(
+                            Container(
+                              width: size.width * 0.27,
+                              height: size.height * 0.12,
+                              decoration: const BoxDecoration(),
+                              padding: const EdgeInsets.all(5),
+                              child: Column(
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Image.asset(
-                                      'assets/images/nomination2.png',
-                                      height: size.height * 0.08,
+                                  SizedBox(
+                                    width: size.width * 0.47,
+                                    height: size.height * 0.06,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                            'assets/images/enquiry.png',
+                                            height: size.height * 0.04,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -361,78 +356,342 @@ class DashboardContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    width: size.width * 0.2,
-                    height: size.height * 0.07,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: const Color(0xffC8EA00),
-                              width: 4,
-                            ),
-                          ),
-                        ),
                         SizedBox(
-                          height: size.height * 0.03,
-                          width: size.width * 0.07,
-                          child: const Center(
-                              // child: Text(
-                              //   nominationCount.toString(),
-                              //   style: TextStyle(
-                              //     color: Colors.white,
-                              //     fontWeight: FontWeight.bold,
-                              //     fontSize: 19,
-                              //   ),
-                              // ),
-                              ),
-                        ),
-                        const Positioned(
-                          top: 0,
-                          right: 6,
-                          child: CircleAvatar(
-                            backgroundColor: Color.fromARGB(255, 0, 0, 0),
-                            radius: 11,
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(5),
-                                child: CircleAvatar(
-                                  backgroundColor: Color(0xffC8EA00),
+                          width: size.width * 0.2,
+                          height: size.height * 0.07,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    // color: const Color(0xffC8EA00),
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    width: 4,
+                                  ),
                                 ),
                               ),
-                            ),
+                              SizedBox(
+                                height: size.height * 0.03,
+                                width: size.width * 0.07,
+                                child: Center(
+                                  child: Text(
+                                    '${enquiryCount ?? 0}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Positioned(
+                                top: 0,
+                                right: 6,
+                                child: CircleAvatar(
+                                  backgroundColor:
+                                      Color.fromARGB(255, 182, 6, 6),
+                                  radius: 11,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child: CircleAvatar(
+                                          // backgroundColor: Color(0xffC8EA00),
+                                          backgroundColor: Color.fromARGB(
+                                              255, 255, 255, 255)),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-              Container(
-                width: size.width * 0.46,
-                padding: const EdgeInsets.only(left: 15, bottom: 10),
-                child: const Text(
-                  'Nomination',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                    Container(
+                      width: size.width * 0.46,
+                      padding: const EdgeInsets.only(left: 15, bottom: 10),
+                      child: const Text(
+                        'Enquiry',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+
+            // Truck Nomination Container
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => truck_nomination()),
+                );
+              },
+              child: Container(
+                width: size.width * 0.47,
+                margin: EdgeInsets.all(size.width * 0.01),
+                constraints: const BoxConstraints(minHeight: 100),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00072D),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: size.width * 0.27,
+                              height: size.height * 0.12,
+                              decoration: const BoxDecoration(),
+                              padding: const EdgeInsets.all(5),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: size.width * 0.47,
+                                    height: size.height * 0.07,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                            'assets/images/nomination2.png',
+                                            height: size.height * 0.08,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: size.width * 0.2,
+                          height: size.height * 0.07,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    // color: const Color(0xffC8EA00),
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    width: 4,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: size.height * 0.03,
+                                width: size.width * 0.07,
+                                child: Center(
+                                  child: Text(
+                                    '${nominationCount ?? 0}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Positioned(
+                                top: 0,
+                                right: 6,
+                                child: CircleAvatar(
+                                  backgroundColor: Color(0xFF00072D),
+                                  radius: 11,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child: CircleAvatar(
+                                          // backgroundColor: Color(0xffC8EA00),
+                                          backgroundColor: Color.fromARGB(
+                                              255, 255, 255, 255)),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      width: size.width * 0.46,
+                      padding: const EdgeInsets.only(left: 15, bottom: 10),
+                      child: const Text(
+                        'Nomination',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-// ),
+
+// row for the pipeline container
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Pipeline container
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const EnquiryApproval()),
+                );
+              },
+              child: Container(
+                width: size.width * 0.96,
+                margin: EdgeInsets.all(size.width * 0.01),
+                constraints: const BoxConstraints(minHeight: 110),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 26, 145, 5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment
+                          .start, // Align children to the start
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: size.width * 0.27,
+                              height: size.height * 0.12,
+                              decoration: const BoxDecoration(),
+                              padding: const EdgeInsets.all(5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment
+                                    .start, // Align text to the start
+                                children: [
+                                  SizedBox(
+                                    width: size.width * 0.47,
+                                    height: size.height * 0.06,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                            'assets/images/pipeline.png',
+                                            height: size.height * 0.06,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    // Added SizedBox here
+                                    height: 20, // Adjust the height as needed
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 10.0),
+                                    child: SizedBox(
+                                      // Added SizedBox here
+                                      height: 20, // Adjust the height as needed
+                                      child: Text(
+                                        'Pipeline', // Text added here
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Spacer(), // Add Spacer widget to push the text and count container to the ends
+                        SizedBox(
+                          width: size.width * 0.2,
+                          height: size.height * 0.07,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    width: 4,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: size.height * 0.03,
+                                width: size.width * 0.07,
+                                child: const Center(
+                                  child: Text(
+                                    '0',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Positioned(
+                                top: 0,
+                                right: 6,
+                                child: CircleAvatar(
+                                  backgroundColor:
+                                      Color.fromARGB(255, 26, 145, 5),
+                                  radius: 11,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child: CircleAvatar(
+                                          backgroundColor: Color.fromARGB(
+                                              255, 255, 255, 255)),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

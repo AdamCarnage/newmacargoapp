@@ -1,9 +1,7 @@
-import 'dart:async';
+// import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:enquiry/models/user_detail_model.dart';
-import 'package:enquiry/pages/login.dart';
-import 'package:enquiry/pages/ma_dashboard.dart'; // Import your dashboard screen
+// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:enquiry/models/user_detail_model.dart'; // Import your dashboard screen
 import 'package:enquiry/utils/user_account_management.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,18 +15,18 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    _loadUserDetail();
   }
 
-  _initializeApp() async {
-    await Future.delayed(Duration(seconds: 2)); // Delay for 2 seconds
+  _loadUserDetail() async {
+    await Future.delayed(const Duration(seconds: 2));
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? apiToken = prefs.getString('api_token');
-
-    if (apiToken != null && apiToken.isNotEmpty) {
+    try {
+      userDetail = (await UserAccountManagement().getUserDetail())!;
+      // Navigate to dashboard if user token exists
       Navigator.pushReplacementNamed(context, '/dashboard');
-    } else {
+    } catch (e) {
+      // Navigate to login screen if user token doesn't exist
       Navigator.pushReplacementNamed(context, '/login');
     }
   }
