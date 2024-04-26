@@ -228,60 +228,6 @@ class _ma_dashboardState extends State<ma_dashboard> {
           }
         },
       ),
-
-      // body: FutureBuilder<int>(
-      //   future: _enquiryCount,
-      //   builder: (context, enquirySnapshot) {
-      //     if (enquirySnapshot.connectionState == ConnectionState.waiting) {
-      //       return const Center(
-      //         child: Column(
-      //           mainAxisAlignment: MainAxisAlignment.center,
-      //           children: [
-      //             SizedBox(
-      //               height: 40,
-      //               width: 40,
-      //               child: CircularProgressIndicator(
-      //                 strokeWidth: 1,
-      //                 valueColor: AlwaysStoppedAnimation<Color>(
-      //                   Color.fromARGB(255, 182, 6, 6),
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       );
-      //     } else if (enquirySnapshot.hasError) {
-      //       if (enquirySnapshot.error is SocketException) {
-      //         return const Center(
-      //           child: Column(
-      //             mainAxisAlignment: MainAxisAlignment.center,
-      //             children: [
-      //               Icon(Icons.wifi_off,
-      //                   size: 60, color: Color.fromARGB(255, 182, 6, 6)),
-      //               Text(
-      //                 'Check Your Internet Connection!',
-      //                 textAlign: TextAlign.center,
-      //                 style: TextStyle(
-      //                   fontSize: 16,
-      //                   color: Colors.grey,
-      //                   fontWeight: FontWeight.bold,
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         );
-      //       }
-      //       return Center(child: Text('Error: ${enquirySnapshot.error}'));
-      //     } else {
-      //       return DashboardContent(
-      //         size: size,
-      //         enquiryCount: enquirySnapshot.data ?? 0,
-      //         nominationCount: nominationSnapshot.data ??
-      //             0, // Commented out nomination count
-      //       );
-      //     }
-      //   },
-      // ),
     );
   }
 }
@@ -553,7 +499,7 @@ class DashboardContent extends StatelessWidget {
           ],
         ),
 
-// row for the pipeline container
+        // row for the pipeline container
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [

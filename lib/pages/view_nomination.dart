@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:enquiry/models/user_detail_model.dart';
 import 'package:enquiry/utils/user_account_management.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ViewNominationPage extends StatefulWidget {
   final Map<String, dynamic> nominationData;
@@ -344,7 +346,7 @@ class _ViewNominationPageState extends State<ViewNominationPage> {
                             actions: <CupertinoActionSheetAction>[
                               CupertinoActionSheetAction(
                                 child: const Text(
-                                  'Approve Enquiry',
+                                  'Approve Nomination',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color:
@@ -353,12 +355,12 @@ class _ViewNominationPageState extends State<ViewNominationPage> {
                                 ),
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  // approveNomination(); // Call the new function here
+                                  approveNomination(); // Call the new function here
                                 },
                               ),
                               CupertinoActionSheetAction(
                                 child: const Text(
-                                  'Reject Enquiry',
+                                  'Reject Nomination',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Color.fromARGB(255, 182, 6,
@@ -367,7 +369,7 @@ class _ViewNominationPageState extends State<ViewNominationPage> {
                                 ),
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  // rejectNomination(); // Keep the rejectEnquiry function as it is
+                                  rejectNomination(); // Keep the rejectEnquiry function as it is
                                 },
                               ),
                             ],
@@ -407,5 +409,136 @@ class _ViewNominationPageState extends State<ViewNominationPage> {
         ),
       ),
     );
+  }
+
+  Future<void> approveNomination() async {
+    if (_remarksController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please provide remarks')),
+      );
+      return;
+    }
+
+    final String apiUrl =
+        'http://macargotest.iosuite.org/api/v1/loading-nomination/approve/${widget.nominationData['id']}';
+
+    final userDetail = await UserAccountManagement().getUserDetail();
+    final userId = userDetail?.user.id.toString();
+
+    final Map<String, String> headers = {
+      'user-id': userId!,
+      // 'department-Id': '3',
+      'Content-Type': 'application/json',
+    };
+
+    final Map<String, dynamic> requestBody = {
+      'remarks': _remarksController.text,
+      'response': 'APPROVED',
+    };
+
+    print('Sending JSON: ${jsonEncode(requestBody)}');
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(apiUrl),
+        headers: headers,
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = {
+          'status': 8000,
+          'message': 'SUCCESS',
+          'data': {
+            'remarks': _remarksController.text,
+            'response': 'APPROVED',
+          },
+        };
+
+        print('Response: ${jsonEncode(responseData)}');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nomination approved successfully')),
+        );
+
+        Navigator.pop(context, true);
+      } else {
+        print('Failed to approve Nomination: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to approve nomination')),
+        );
+      }
+    } catch (e) {
+      print('Error sending request: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('An error occurred while sending the request')),
+      );
+    }
+  }
+
+  Future<void> rejectNomination() async {
+    if (_remarksController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please provide remarks')),
+      );
+      return;
+    }
+
+    final String apiUrl =
+        'http://macargotest.iosuite.org/api/v1/loading-nomination/approve/${widget.nominationData['id']}';
+
+    final userDetail = await UserAccountManagement().getUserDetail();
+    final userId = userDetail?.user.id.toString();
+
+    final Map<String, String> headers = {
+      'department-Id': '3',
+      'user-id': userId!,
+      'Content-Type': 'application/json',
+    };
+
+    final Map<String, dynamic> requestBody = {
+      'remarks': _remarksController.text,
+      'response': 'REJECTED',
+    };
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(apiUrl),
+        headers: headers,
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = {
+          'status': 8000,
+          'message': 'SUCCESS',
+          'data': {
+            'remarks': _remarksController.text,
+            'response': 'REJECTED',
+          },
+        };
+
+        print('Response: ${jsonEncode(responseData)}');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nomination rejected successfully')),
+        );
+
+        // Navigate back to the previous screen and pass the result
+        Navigator.pop(context, true);
+      } else {
+        print('Failed to reject nomination: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to reject nomination')),
+        );
+      }
+    } catch (e) {
+      print('Error sending request: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('An error occurred while sending the request')),
+      );
+    }
   }
 }

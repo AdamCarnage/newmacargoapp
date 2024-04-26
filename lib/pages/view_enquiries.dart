@@ -497,9 +497,12 @@ class _ViewEnquiryPage1State extends State<ViewEnquiryPage1> {
     final String apiUrl =
         'http://www.macargotest.iosuite.org/api/v1/enquiry/approve/${widget.enquiry['client_inquiry_id']}';
 
+    final userDetail = await UserAccountManagement().getUserDetail();
+    final userId = userDetail?.user.id.toString();
+
     final Map<String, String> headers = {
       'department-Id': '3',
-      'user-id': '40',
+      'user-id': userId!,
       'Content-Type': 'application/json',
     };
 
