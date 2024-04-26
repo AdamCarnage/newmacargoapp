@@ -80,6 +80,11 @@ flutter:
     - assets/images/setting.png
     - assets/images/brand.png
     - assets/images/pipeline.png
+    - assets/images/debt.png
+    - assets/images/credt.png
+    - assets/images/allowance.png
+    - assets/images/requisition.png
+    - assets/images/amend.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -248,6 +248,137 @@ class DashboardContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Debtors Container
+              Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 182, 6, 6),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Transform.scale(
+                      scale: 0.7, // Adjust the scale factor as needed
+                      child: Image.asset(
+                        'assets/images/credt.png',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  const Text(
+                    'Debtors',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Creditors Container
+              Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 182, 6, 6),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Transform.scale(
+                      scale: 0.7, // Adjust the scale factor as needed
+                      child: Image.asset(
+                        'assets/images/debt.png',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  const Text(
+                    'Creditors',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              // Allowance Container
+              Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 182, 6, 6),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Transform.scale(
+                      scale: 0.7, // Adjust the scale factor as needed
+                      child: Image.asset(
+                        'assets/images/allowance.png',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  const Text(
+                    'Allowance',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              // Requisition Container
+              Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 182, 6, 6),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Transform.scale(
+                      scale: 0.7, // Adjust the scale factor as needed
+                      child: Image.asset(
+                        'assets/images/requisition.png',
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  const Text(
+                    'Requisition',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Container(
+        //   margin: EdgeInsets.zero,
+        //   child: const Divider(
+        //     height: 1,
+        //     thickness: 1,
+        //     color: Colors.grey,
+        //   ),
+        // ),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -291,7 +422,7 @@ class DashboardContent extends StatelessWidget {
                                           padding: const EdgeInsets.all(8.0),
                                           child: Image.asset(
                                             'assets/images/enquiry.png',
-                                            height: size.height * 0.04,
+                                            height: size.height * 0.07,
                                           ),
                                         ),
                                       ],
@@ -503,29 +634,27 @@ class DashboardContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // Pipeline container
+            // Enquiry Container
             GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const EnquiryApproval()),
-                );
-              },
+              // onTap: () {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => const EnquiryApproval()),
+              //   );
+              // },
               child: Container(
-                width: size.width * 0.96,
+                width: size.width * 0.47,
                 margin: EdgeInsets.all(size.width * 0.01),
-                constraints: const BoxConstraints(minHeight: 110),
+                constraints: const BoxConstraints(minHeight: 100),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 26, 145, 5),
+                  color: Color.fromARGB(255, 1, 129, 175),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment
-                          .start, // Align children to the start
                       children: [
                         Column(
                           children: [
@@ -535,8 +664,6 @@ class DashboardContent extends StatelessWidget {
                               decoration: const BoxDecoration(),
                               padding: const EdgeInsets.all(5),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment
-                                    .start, // Align text to the start
                                 children: [
                                   SizedBox(
                                     width: size.width * 0.47,
@@ -547,29 +674,10 @@ class DashboardContent extends StatelessWidget {
                                           padding: const EdgeInsets.all(8.0),
                                           child: Image.asset(
                                             'assets/images/pipeline.png',
-                                            height: size.height * 0.06,
+                                            height: size.height * 0.09,
                                           ),
                                         ),
                                       ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    // Added SizedBox here
-                                    height: 20, // Adjust the height as needed
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 10.0),
-                                    child: SizedBox(
-                                      // Added SizedBox here
-                                      height: 20, // Adjust the height as needed
-                                      child: Text(
-                                        'Pipeline', // Text added here
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ],
@@ -577,7 +685,6 @@ class DashboardContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Spacer(), // Add Spacer widget to push the text and count container to the ends
                         SizedBox(
                           width: size.width * 0.2,
                           height: size.height * 0.07,
@@ -599,10 +706,10 @@ class DashboardContent extends StatelessWidget {
                               SizedBox(
                                 height: size.height * 0.03,
                                 width: size.width * 0.07,
-                                child: const Center(
+                                child: Center(
                                   child: Text(
                                     '0',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 19,
@@ -615,7 +722,7 @@ class DashboardContent extends StatelessWidget {
                                 right: 6,
                                 child: CircleAvatar(
                                   backgroundColor:
-                                      Color.fromARGB(255, 26, 145, 5),
+                                      Color.fromARGB(255, 1, 129, 175),
                                   radius: 11,
                                   child: Center(
                                     child: Padding(
@@ -631,6 +738,140 @@ class DashboardContent extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                    Container(
+                      width: size.width * 0.46,
+                      padding: const EdgeInsets.only(left: 15, bottom: 10),
+                      child: const Text(
+                        'Pipeline',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Driver Ammendment Container
+            GestureDetector(
+              // onTap: () {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(builder: (context) => truck_nomination()),
+              //   );
+              // },
+              child: Container(
+                width: size.width * 0.47,
+                margin: EdgeInsets.all(size.width * 0.01),
+                constraints: const BoxConstraints(minHeight: 100),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 211, 46, 0),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: size.width * 0.27,
+                              height: size.height * 0.12,
+                              decoration: const BoxDecoration(),
+                              padding: const EdgeInsets.all(5),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: size.width * 0.47,
+                                    height: size.height * 0.07,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                            'assets/images/amend.png',
+                                            height: size.height * 0.08,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: size.width * 0.2,
+                          height: size.height * 0.07,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                    // color: const Color(0xffC8EA00),
+                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    width: 4,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: size.height * 0.03,
+                                width: size.width * 0.07,
+                                child: Center(
+                                  child: Text(
+                                    '0',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Positioned(
+                                top: 0,
+                                right: 6,
+                                child: CircleAvatar(
+                                  backgroundColor:
+                                      Color.fromARGB(255, 211, 46, 0),
+                                  radius: 11,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child: CircleAvatar(
+                                          backgroundColor: Color.fromARGB(
+                                              255, 255, 255, 255)),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      width: size.width * 0.46,
+                      padding: const EdgeInsets.only(left: 15, bottom: 10),
+                      child: const Text(
+                        'Driver Amendment',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),

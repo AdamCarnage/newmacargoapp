@@ -86,7 +86,51 @@ class _trucknominationState extends State<truck_nomination>
                 ),
               );
             } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
+              // Display icon and text when there is an error
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/404.png',
+                      height: 100,
+                      width: 100,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'There is an Issue with the Network',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+              // Display icon and text when no data is available
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/404.png',
+                      height: 100,
+                      width: 100,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'No Nomination Loaded',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              );
             } else {
               List<dynamic> nominationData = snapshot.data ?? [];
 

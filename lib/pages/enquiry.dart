@@ -85,7 +85,6 @@ class _EnquiryApprovalState extends State<EnquiryApproval>
                 ),
               );
             } else if (snapshot.hasError) {
-              // return Center(child: Text('Error: ${snapshot.error}'));
               // Display icon and text when there is an error
               return Center(
                 child: Column(
